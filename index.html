@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantau Buku Setor Bank Sampah | Kraton Indah Lestari</title>
+<style>
+:root{--green:#176b45;--green2:#e8f4ec;--ink:#20312a;--muted:#66756d;--line:#dce6df;--paper:#fff;--bg:#f4f7f4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,#145b3a,#258153);color:white;padding:28px 18px}
+.wrap{max-width:1200px;margin:auto;padding:0 16px}
+header .wrap{padding:0 16px}
+.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;opacity:.88}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.2;margin:.45rem 0}
+header p{margin:.4rem 0 0;opacity:.94}
+main{padding:22px 0 42px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:18px;box-shadow:0 3px 12px #183b2410}
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+label{font-weight:700}
+select{font:inherit;padding:10px 38px 10px 12px;border:1px solid #a9b9ae;border-radius:9px;background:white;color:var(--ink);min-width:220px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.metric{border-radius:13px;padding:17px;background:var(--green2);border:1px solid #d5e9da;min-width:0}
+.metric .label{font-size:.85rem;color:#476653}
+.metric .value{font-size:clamp(1.15rem,3vw,1.8rem);font-weight:800;margin-top:5px;overflow-wrap:anywhere}
+h2{font-size:1.2rem;margin:0 0 12px}
+.sub{color:var(--muted);font-size:.9rem;margin:-5px 0 12px}
+.table-scroll{overflow:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;background:white;font-size:.9rem}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#edf5ef;color:#244d35;text-align:center;white-space:nowrap}
+td.num,th.num{text-align:right;white-space:nowrap}
+td.center{text-align:center}
+tbody tr:last-child td{border-bottom:0}
+.total-row td{font-weight:800;background:#f0f7f1}
+.detail-table{min-width:1050px}
+.rekap-table{min-width:480px}
+.pill{display:inline-block;border-radius:999px;background:#e5f4e9;color:#176b45;padding:3px 9px;font-size:.78rem;font-weight:700}
+.empty,.error{padding:18px;border-radius:10px;background:#fff8e7;border:1px solid #f0dfac;color:#66531d}
+.error{background:#fff0ef;border-color:#f0c6c1;color:#8c2e25}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:12px 0 24px}
+@media(max-width:640px){header{padding:23px 0}.wrap{padding:0 11px}.panel{padding:13px}.cards{gap:7px}.metric{padding:11px 9px}.metric .label{font-size:.72rem}.metric .value{font-size:1.05rem}th,td{padding:8px;font-size:.82rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">Laporan dan transparansi lingkungan</div>
+  <h1>Pantau Buku Setor Bank Sampah</h1>
+  <p>Bank Sampah Unit Kraton Indah Lestari</p>
+</div></header>
+<main class="wrap">
+  <section class="panel">
+    <div class="controls">
+      <label for="periode">Pilih periode laporan</label>
+      <select id="periode" aria-label="Pilih bulan laporan"><option>Memuat arsip…</option></select>
+      <span id="status" class="pill">Arsip bulanan</span>
+    </div>
+  </section>
+  <section class="cards" aria-label="Ringkasan laporan">
+    <div class="metric"><div class="label">Total Transaksi</div><div class="value" id="totalTransaksi">—</div></div>
+    <div class="metric"><div class="label">Total Berat</div><div class="value" id="totalBerat">—</div></div>
+    <div class="metric"><div class="label">Total Nilai</div><div class="value" id="totalNilai">—</div></div>
+  </section>
+  <section class="panel">
+    <h2>Rekapitulasi Jenis Sampah</h2>
+    <p class="sub">Total berat dan nilai per kategori untuk periode terpilih.</p>
+    <div class="table-scroll"><table class="rekap-table">
+      <thead><tr><th>JENIS SAMPAH</th><th class="num">TOTAL BERAT (KG)</th><th class="num">TOTAL NILAI (Rp)</th></tr></thead>
+      <tbody id="rekapBody"></tbody>
+    </table></div>
+  </section>
+  <section class="panel">
+    <h2>Lampiran Rincian Data Setoran Nasabah</h2>
+    <p class="sub">Seluruh transaksi pada bulan yang dipilih, termasuk rincian setiap jenis sampah.</p>
+    <div class="table-scroll"><table class="detail-table">
+      <thead><tr><th>NO</th><th>TANGGAL</th><th>REG</th><th>NAMA NASABAH</th><th>ALAMAT</th><th>RINCIAN JENIS SAMPAH</th><th class="num">TOTAL BERAT</th><th class="num">NILAI</th></tr></thead>
+      <tbody id="detailBody"></tbody>
+    </table></div>
+    <div id="empty" class="empty" hidden>Tidak ada transaksi untuk periode ini.</div>
+  </section>
+  <div id="message" role="status" aria-live="polite"></div>
+</main>
+<footer><div class="wrap">Pantau Buku Setor Bank Sampah · Arsip laporan yang telah ditutup</div></footer>
+<script>
+const categories = [
+  ["plastikKeras","Plastik Keras"],["plastikFleksibel","Plastik Fleksibel"],
+  ["kertas","Kertas"],["logam","Logam"],["kaca","Kaca"],
+  ["karetKulit","Karet / Kulit"],["kainTekstil","Kain / Tekstil"],
+  ["anorganikLain","Anorganik Lain"]
+];
+const rupiah = n => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
+const berat = n => (Number(n)||0).toLocaleString("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2});
+const dateLabel = s => {
+  if(!s) return "—";
+  const p=String(s).split("-");
+  return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : s;
+};
+const monthLabel = s => {
+  const [y,m]=s.split("-");
+  const names=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  return `${names[Number(m)-1]||m} ${y}`;
+};
+function cell(tag,text,cls=""){const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;}
+let data;
+function render(month){
+  const archive=data.arsip.find(a=>a.bulan===month);
+  const rows=data.setoran.filter(x=>x.cycle===month).sort((a,b)=>(a.tanggal||"").localeCompare(b.tanggal||"")||(a.register||"").localeCompare(b.register||""));
+  if(!archive){document.getElementById("message").innerHTML='<div class="error">Arsip untuk periode ini tidak ditemukan.</div>';return;}
+  document.getElementById("message").textContent="";
+  document.getElementById("status").textContent=archive.status==="closed"?"Arsip ditutup":"Arsip";
+  document.getElementById("totalTransaksi").textContent=Number(archive.totalTransaksi||rows.length).toLocaleString("id-ID");
+  document.getElementById("totalBerat").textContent=berat(archive.totalBerat)+" kg";
+  document.getElementById("totalNilai").textContent=rupiah(archive.totalHarga);
+  const rb=document.getElementById("rekapBody");rb.replaceChildren();
+  for(const [key,label] of categories){
+    const r=archive.rincian?.[key]||{};
+    const tr=document.createElement("tr");
+    tr.append(cell("td",r.nama||label));
+    tr.append(cell("td",berat(r.berat),"num"));
+    tr.append(cell("td",rupiah(r.harga),"num"));
+    rb.append(tr);
+  }
+  const total=document.createElement("tr");total.className="total-row";
+  total.append(cell("td","TOTAL"));
+  total.append(cell("td",berat(archive.totalBerat),"num"));
+  total.append(cell("td",rupiah(archive.totalHarga),"num"));rb.append(total);
+  const db=document.getElementById("detailBody");db.replaceChildren();
+  rows.forEach((x,i)=>{
+    const tr=document.createElement("tr");
+    tr.append(cell("td",String(i+1),"center"));
+    tr.append(cell("td",dateLabel(x.tanggal),"center"));
+    tr.append(cell("td",x.register||"—","center"));
+    tr.append(cell("td",x.nama||"—"));
+    tr.append(cell("td",x.alamat||"—"));
+    const parts=[];
+    for(const [key,label] of categories){
+      const w=Number(x[key+"Berat"]||0),v=Number(x[key+"Harga"]||0);
+      if(w!==0||v!==0) parts.push(`${label}: ${berat(w)} kg (${rupiah(v)})`);
+    }
+    tr.append(cell("td",parts.join("; ")||"—"));
+    tr.append(cell("td",berat(x.totalBerat),"num"));
+    tr.append(cell("td",rupiah(x.totalHarga),"num"));
+    db.append(tr);
+  });
+  document.getElementById("empty").hidden=rows.length!==0;
+}
+async function init(){
+  try{
+    const res=await fetch("./data.json",{cache:"no-store"});
+    if(!res.ok) throw new Error("data.json tidak ditemukan (HTTP "+res.status+").");
+    data=await res.json();
+    const archives=(data.arsip||[]).filter(a=>a.status==="closed").sort((a,b)=>b.bulan.localeCompare(a.bulan));
+    if(!archives.length) throw new Error("Belum ada arsip yang berstatus ditutup.");
+    const select=document.getElementById("periode");select.replaceChildren();
+    for(const a of archives){const o=document.createElement("option");o.value=a.bulan;o.textContent=monthLabel(a.bulan);select.append(o);}
+    select.addEventListener("change",()=>render(select.value));
+    render(archives[0].bulan);
+  }catch(e){
+    document.getElementById("message").innerHTML="";
+    const box=document.createElement("div");box.className="error";box.textContent="Gagal memuat laporan: "+e.message+" Pastikan index.html dan data.json berada dalam folder yang sama dan dibuka melalui server web.";
+    document.getElementById("message").append(box);
+  }
+}
+init();
+</script>
+</body>
+</html>
